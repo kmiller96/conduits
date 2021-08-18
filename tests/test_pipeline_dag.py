@@ -1,0 +1,1 @@
+"""Asserts that the pipeline was successfully able to generate the correct DAG."""

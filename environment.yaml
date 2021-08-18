@@ -7,3 +7,5 @@ dependencies:
   - pytest
   - pandas
   - black
+  - pip:
+    - pytest-regressions
