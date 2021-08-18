@@ -9,3 +9,4 @@ dependencies:
   - black
   - pip:
     - pytest-regressions
+    - networkx[default]

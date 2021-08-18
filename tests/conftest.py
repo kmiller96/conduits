@@ -8,12 +8,16 @@ from tether import Pipeline
 ## Testing Data Fixtures ##
 ###########################
 
+
 @pytest.fixture
 def data():
-    return pd.DataFrame({
-        'A': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        'B': [-1.0, -0.8, -0.6, -0.4, -0.2, 0.2, 0.4, 0.6, 0.8, 1.0],
-    })
+    return pd.DataFrame(
+        {
+            "A": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+            "B": [-1.0, -0.8, -0.6, -0.4, -0.2, 0.2, 0.4, 0.6, 0.8, 1.0],
+        }
+    )
+
 
 ##################################
 ## Pipeline Definition Fixtures ##
@@ -26,9 +30,9 @@ def simple_stateless_pipeline():
 
     @pipeline.step()
     def tester(data: pd.DataFrame) -> pd.DataFrame:
-        data['tested'] = True
+        data["tested"] = True
         return data
-    
+
     return pipeline
 
 
@@ -38,15 +42,15 @@ def simple_stateful_pipeline():
 
     @pipeline.step()
     def adder(data: pd.DataFrame, fit: bool) -> pd.DataFrame:
-        data['tested'] = True
+        data["tested"] = True
 
         if fit:  # TODO: Save/load an actual artifact.
-            data['fitted'] = 'yes'
+            data["fitted"] = "yes"
         else:
-            data['fitted'] = 'no'
+            data["fitted"] = "no"
 
         return data
-    
+
     return pipeline
 
 
@@ -54,19 +58,24 @@ def simple_stateful_pipeline():
 def unordered_pipeline():
     pipeline = Pipeline()
 
-    @pipeline.step(dependencies=['A'])
-    def B(data: pd.DataFrame) -> pd.DataFrame:
-        ...
-        return data
-
     @pipeline.step()
-    def A(data: pd.DataFrame) -> pd.DataFrame:
-        data['tested'] = True
+    def base(data: pd.DataFrame) -> pd.DataFrame:
+        data["string"] = "."
         return data
 
-    @pipeline.step(dependencies=["C"])
-    def C(data: pd.DataFrame) -> pd.DataFrame:
-        ...
+    @pipeline.step(dependencies=["A"])
+    def B(data: pd.DataFrame) -> pd.DataFrame:
+        data["string"] += "B"
         return data
-    
+
+    @pipeline.step(dependencies=["base"])
+    def A(data: pd.DataFrame) -> pd.DataFrame:
+        data["string"] += "A"
+        return data
+
+    @pipeline.step(dependencies=["B"])
+    def C(data: pd.DataFrame) -> pd.DataFrame:
+        data["string"] += "C"
+        return data
+
     return pipeline
