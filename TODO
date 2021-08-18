@@ -1,0 +1,7 @@
+MVP:
+	[ ] Declare pipelines via decorator syntax.
+
+Extensions:
+	✔ Allow decorators to be optionally executed @done(21-08-18 10:50)
+	[ ] Compute parallel depdendencies simultaneously.
+	[ ] Checkpoint pipeline state via decorator flag.
