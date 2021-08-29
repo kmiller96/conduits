@@ -6,7 +6,7 @@ usually done completely differently to the way the pipelines where developed
 during the ideation phase, requiring significate rewrite to get them to work
 in the new paradigm.
 
-Modelled off the declarative pipeline of Flask, **Tether** aims to give you a
+Modelled off the declarative pipeline of Flask, **Conduits** aims to give you a
 nicer, simpler, and more flexible way of declaring your data processing pipelines.
 
 ## Installation

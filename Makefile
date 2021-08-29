@@ -1,7 +1,7 @@
 build:
 	python setup.py sdist bdist_wheel
 
-publish:
+publish: build
 	twine upload dist/*
 
 tests:

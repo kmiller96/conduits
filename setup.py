@@ -5,9 +5,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="conduits",
-    version="0.0.1",
+    version="0.0.2",
     author="Kale Miller",
-    author_email="kale.miller@prometheusai.com.au",
+    url="https://github.com/kmiller96/conduits",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
