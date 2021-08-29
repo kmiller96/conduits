@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Callable, Iterable
 from inspect import signature
-from dataclasses import dataclass
 
 import pandas as pd
 import networkx as nx
