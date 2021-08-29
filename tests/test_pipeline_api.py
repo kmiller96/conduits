@@ -1,5 +1,6 @@
 """Asserts that the pipeline has the correct API."""
 
+import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
@@ -15,6 +16,14 @@ def test_pipeline_mocks_scikit_api(
 
     assert_frame_equal(output1, output2)
     dataframe_regression.check(output1)
+
+
+@pytest.mark.parametrize("obj", [[1, 2, 3], "hello", {10, 20}, {"name": "bob"}])
+def test_pipeline_only_accepts_pandas(obj, simple_stateful_pipeline):
+    pipeline = simple_stateful_pipeline
+
+    with pytest.raises(TypeError):
+        pipeline.fit(obj)
 
 
 class TestFitTransformStateManagement:

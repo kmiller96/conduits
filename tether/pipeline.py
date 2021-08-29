@@ -8,6 +8,19 @@ import networkx as nx
 from networkx.algorithms.traversal.edgebfs import edge_bfs
 
 
+def assert_data_is_pandas_type(obj) -> bool:
+    """Forces the user to use Pandas types in their inputs."""
+    valid_types = {pd.DataFrame, pd.Series}
+
+    is_valid = any(isinstance(obj, t) for t in valid_types)
+    if not is_valid:
+        raise TypeError(
+            "Passed value is not of a valid type.\n"
+            f"Type passed: {type(obj)}\n"
+            f"Valid types: {valid_types}"
+        )
+
+
 class Pipeline:
     def __init__(self, verbose=False) -> None:
         self.verbose = verbose
@@ -19,6 +32,7 @@ class Pipeline:
     def _execute(
         self, data: pd.DataFrame, fit=False, transform=True, *args, **kwargs
     ) -> pd.DataFrame:
+        assert_data_is_pandas_type(data)
         data = data.copy()
 
         executed = set()
