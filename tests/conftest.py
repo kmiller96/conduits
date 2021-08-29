@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from pytest_regressions.dataframe_regression import DataFrameRegressionFixture
 
-from tether import Pipeline
+from conduits import Pipeline
 
 ###########################
 ## Testing Data Fixtures ##
