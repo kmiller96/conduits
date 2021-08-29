@@ -1,9 +1,0 @@
-name: tether
-channels:
-  - defaults
-dependencies:
-  - python
-  - pip
-  - pytest
-  - pandas
-  - black

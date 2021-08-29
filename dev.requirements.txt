@@ -1,0 +1,10 @@
+## Package ##
+conduits
+
+## Testing ##
+pytest
+pytest-regressions
+
+## Misc ##
+twine
+black
