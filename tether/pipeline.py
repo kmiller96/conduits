@@ -9,15 +9,16 @@ from networkx.algorithms.traversal.edgebfs import edge_bfs
 
 
 class Pipeline:
-    def __init__(self) -> None:
+    def __init__(self, verbose=False) -> None:
+        self.verbose = verbose
+
         self._dag = nx.Graph()
         self._dag.add_node("root")
         self._functions = {}
 
-    def __call__(self, data: pd.DataFrame) -> pd.DataFrame:
-        return self.transform(data)
-
-    def _execute(self, data: pd.DataFrame, fit=False, *args, **kwargs) -> pd.DataFrame:
+    def _execute(
+        self, data: pd.DataFrame, fit=False, transform=True, *args, **kwargs
+    ) -> pd.DataFrame:
         data = data.copy()
 
         executed = set()
@@ -27,13 +28,22 @@ class Pipeline:
             else:
                 executed.add(dest)
 
-            print(f"Executing {dest}...")
-            func = self._functions[dest]
+            if self.verbose:
+                print(f"Executing {dest}...")
 
-            if "fit" not in signature(func).parameters:
-                data = func(data, *args, **kwargs)
-            else:
-                data = func(data, fit=fit, *args, **kwargs)
+            func = self._functions[dest]
+            sig = signature(func).parameters
+
+            execution_args = [data, *args]
+            execution_kwargs = kwargs
+
+            if "fit" in sig:
+                execution_kwargs["fit"] = fit
+
+            if "transform" in sig:
+                execution_kwargs["transform"] = transform
+
+            data = func(*execution_args, **execution_kwargs)
 
         return data
 
@@ -42,11 +52,11 @@ class Pipeline:
     ######################
 
     def fit(self, X: pd.DataFrame) -> Pipeline:
-        self._execute(X, fit=True)
+        self._execute(X, fit=True, transform=False)
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        return self._execute(X, fit=False)
+        return self._execute(X, fit=False, transform=True)
 
     def fit_transform(self, X: pd.DataFrame) -> pd.DataFrame:
         self.fit(X)
