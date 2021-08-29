@@ -1,6 +1,3 @@
-install:
-	pip install -e .
-
 build:
 	python setup.py sdist bdist_wheel
 
