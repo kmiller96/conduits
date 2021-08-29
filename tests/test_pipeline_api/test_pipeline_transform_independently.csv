@@ -1,0 +1,11 @@
+,A,B,tested,fitted_value
+0,10,-1,True,something serialised
+1,20,-0.80000000000000004,True,something serialised
+2,30,-0.59999999999999998,True,something serialised
+3,40,-0.40000000000000002,True,something serialised
+4,50,-0.20000000000000001,True,something serialised
+5,60,0.20000000000000001,True,something serialised
+6,70,0.40000000000000002,True,something serialised
+7,80,0.59999999999999998,True,something serialised
+8,90,0.80000000000000004,True,something serialised
+9,100,1,True,something serialised

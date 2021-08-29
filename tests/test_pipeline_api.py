@@ -15,3 +15,14 @@ def test_pipeline_mocks_scikit_api(
 
     assert_frame_equal(output1, output2)
     dataframe_regression.check(output1)
+
+
+class TestFitTransformStateManagement:
+    def test_pipeline_fit_independently(self, data, simple_stateful_pipeline):
+        simple_stateful_pipeline.fit(data)
+
+    def test_pipeline_transform_independently(
+        self, data, simple_stateful_pipeline, dataframe_regression
+    ):
+        output = simple_stateful_pipeline.transform(data)
+        dataframe_regression.check(output)
