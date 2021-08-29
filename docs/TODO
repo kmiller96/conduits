@@ -1,9 +1,10 @@
 MVP:
 	✔ Declare pipelines via decorator syntax. @started(21-08-18 12:10) @done(21-08-18 12:11) @lasted(1m1s)
-	[ ] Add helpful error messages.
+	✔ Add helpful error messages. @done(21-08-29 12:30)
 
 Extensions:
 	[ ] Add pretty printing of pipeline progress.
 	[ ] Allow decorators to be optionally executed
 	[ ] Compute parallel depdendencies simultaneously.
 	[ ] Checkpoint pipeline state via decorator flag.
+	[ ] Supply hyperparameters to the functions at runtime (for hyperparameter tuning, etc.).
