@@ -15,7 +15,7 @@ from conduits import Pipeline
 
 
 @pytest.fixture
-def data():
+def data() -> pd.DataFrame:
     return pd.DataFrame(
         {
             "A": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
@@ -30,7 +30,7 @@ def data():
 
 
 @pytest.fixture
-def simple_stateless_pipeline():
+def simple_stateless_pipeline() -> Pipeline:
     pipeline = Pipeline()
 
     @pipeline.step()
@@ -42,7 +42,7 @@ def simple_stateless_pipeline():
 
 
 @pytest.fixture(scope="class")
-def simple_stateful_pipeline():
+def simple_stateful_pipeline() -> Pipeline:
     tmp_path = Path(NamedTemporaryFile().name)
     pipeline = Pipeline()
 
@@ -64,7 +64,7 @@ def simple_stateful_pipeline():
 
 
 @pytest.fixture
-def unordered_stateless_pipeline():
+def unordered_stateless_pipeline() -> Pipeline:
     pipeline = Pipeline()
 
     @pipeline.step()
@@ -91,7 +91,7 @@ def unordered_stateless_pipeline():
 
 
 @pytest.fixture(scope="class")
-def unordered_stateful_pipeline():
+def unordered_stateful_pipeline() -> Pipeline:
     tmp_path = Path(NamedTemporaryFile().name)
     pipeline = Pipeline()
 
