@@ -30,13 +30,13 @@ pipeline["transformed"] = False
 
 
 @pipeline.step(dependencies=["first_step"])
-def second_step(data):
-    return data + 1
+def second_step(data, *, adder=0):
+    return data + adder
 
 
 @pipeline.step()
-def first_step(data):
-    return data ** 2
+def first_step(data, *, power=1):
+    return data ** power 
 
 
 @pipeline.step(dependencies=["second_step"])
@@ -55,7 +55,8 @@ df = pd.DataFrame({"X": [1, 2, 3], "Y": [10, 20, 30]})
 
 assert pipeline["transformed"] == False
 
-output = pipeline.fit_transform(df)
+output = pipeline.fit_transform(df, adder=1, multiplier=2)
+
 assert output.X.sum() != 29  # Addition before square => False!
 assert output.X.sum() == 17  # Square before addition => True!
 assert pipeline["transformed"] == True
@@ -69,6 +70,8 @@ assert reloaded["transformed"] == True  # State is persisted on reload.
 ## Usage Guide
 
 ### Declarations
+
+#### Pipeline Decorator
 Your pipeline is defined using a standard decorator syntax. You can wrap your
 pipeline steps using the decorator:
 
@@ -78,13 +81,72 @@ def transformer(df):
     return df + 1
 ```
 
-The decoratored function should accept a pandas dataframe or pandas series and
-return a pandas dataframe or pandas series. Arbitrary inputs and outputs are
-currently unsupported. 
+#### Function Signature
+The decorated function's signature carries all the information Conduits needs
+to infer what functionality it needs to activate. You can pass in a single 
+dataframe or many dataframes into the signature, and this will be carried 
+through during the `fit()`, `transform()`, and `fit_transform()` calls. Hence
+both function signatures would work:
 
+```python
+pipeline = Pipeline()
+
+...
+
+@pipeline.step()
+def single_frame(data):
+    return data + 1
+
+...
+
+df = pipeline.fit_transform(df)
+```
+
+```python
+pipeline = Pipeline()
+
+...
+
+@pipeline.step()
+def Xy_transfomer(X, y):
+    return X + 1, y
+
+...
+
+X, y = pipeline.fit_transform(X, y)
+```
+
+You can also define hyperparameters that your function has access to by including
+them in the function signature after the `*` separator (see 
+[PEP 3102](https://www.python.org/dev/peps/pep-3102/)). It is recommended that
+you set a default value for the hyperparameter but it is not necessary
+
+```python
+pipeline = Pipeline()
+
+...
+
+@pipeline.step()
+def adder(data, *, n):
+    return data + n
+
+@pipeline.step()
+def multiplier(data, *, m=1):
+    return data * m
+
+...
+
+df = pipeline.fit_transform(df)  # Fail! `n` isn't passed in
+df = pipeline.fit_transform(df, n=1)  # Will succeed! `n`=1, `m`=1
+df = pipeline.fit_transform(df, n=1, m=2)  # Will succeed! `n`=`, `m`=2
+```
+
+#### Stateful Transformers
 If your transformer is stateful, you can optionally supply the function with
 `fit` and `transform` boolean arguments. They will be set as `True` when the 
-appropriate method is called.
+appropriate method is called. Both arguments are optional and independent of 
+one another (i.e. you can just have the `fit` argument without the `transform`
+argument).
 
 ```python
 @pipeline.step()
@@ -99,6 +161,7 @@ def stateful(data: pd.DataFrame, fit: bool, transform: bool):
     return data
 ```
 
+#### Pipeline Serialisation
 **You should not serialise the pipeline object itself**. Rather, you should
 use the `pipeline.save(path)` and `pipeline.load(path)` to handle serialisation
 and deserialisation. 
