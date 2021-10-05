@@ -1,6 +1,7 @@
 """Asserts that the pipeline was successfully able to generate the correct DAG."""
 
 import pandas as pd
+from pandas.testing import assert_frame_equal
 from conduits.pipeline import Pipeline
 
 
@@ -59,6 +60,20 @@ def test_pipeline_passes_hyperparameters(
 ):
     pipeline = pipeline_with_hyperparams
 
+    output = pipeline.fit_transform(data)  # Defaults set of n=0, m=0
+    assert (output["n"] == 0).all()
+    assert (output["m"] == 0).all()
+
     output = pipeline.fit_transform(data, n=10, m=5)
     assert (output["n"] == 10).all()
     assert (output["m"] == 5).all()
+
+
+def test_pipeline_steps_can_be_called_after_decorating(data: pd.DataFrame):
+    pipeline = Pipeline()
+
+    @pipeline.step()
+    def f(df: pd.DataFrame):
+        return df + 1
+
+    assert_frame_equal(f(data), data + 1)

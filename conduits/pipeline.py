@@ -135,6 +135,7 @@ class Pipeline:
 
         def _wrapper(func):
             self.add_step(func, dependencies=dependencies)
+            return func
 
         return _wrapper
 
