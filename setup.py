@@ -12,5 +12,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     python_requires=">=3.6",
-    install_requires=["pandas", "networkx[default]"],
+    install_requires=[
+        "pandas",
+        "networkx[default]",
+        "joblib",
+    ],
 )

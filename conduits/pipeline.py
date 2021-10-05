@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import Callable, Iterable
 from inspect import signature
+from pathlib import Path
 
 import pandas as pd
 import networkx as nx
+import joblib
 from networkx.algorithms.traversal.edgebfs import edge_bfs
 
 
@@ -23,6 +25,7 @@ def assert_data_is_pandas_type(obj) -> bool:
 class Pipeline:
     def __init__(self, verbose=False) -> None:
         self.verbose = verbose
+        self.artifacts = {}
 
         self._dag = nx.Graph()
         self._dag.add_node("root")
@@ -75,13 +78,43 @@ class Pipeline:
         self.fit(X)
         return self.transform(X)
 
+    ##############################################
+    ## Artifact Serialisation / Deserialisation ##
+    ##############################################
+
+    def __getitem__(self, key):
+        """Allows a user to fetch an artifact from the pipeline."""
+        return self.artifacts[key]
+
+    def __setitem__(self, key, value):
+        """Allows a user to write an artifact into the pipeline."""
+        self.artifacts[key] = value
+
+    def save(self, path: Path):
+        """Saves all pipeline objects into joblib files.
+
+        Uses the artifacts property to decide what needs to be serialised. Can
+        handle custom classes such as Scikit Learn estimators.
+        """
+        joblib.dump(self.artifacts, path)
+        return self
+
+    def load(self, path: Path):
+        """Loads all pipeline objects, serialised as joblib files, into memory.
+
+        Uses the artifacts property to decide what needs to be serialised. Can
+        handle custom classes such as Scikit Learn estimators.
+        """
+        self.artifacts = joblib.load(path)
+        return self
+
     ###################
     ## DAG Decorator ##
     ###################
 
     def step(self, dependencies=[]) -> Callable:
         """Decorator to define a new pipeline step.
-        
+
         The decorator *must* be executed prior to decorating.
 
         Good ✔
