@@ -1,5 +1,5 @@
 import pickle
-from uuid import uuid4
+from typing import Union
 from tempfile import NamedTemporaryFile
 from pathlib import Path
 
@@ -34,9 +34,10 @@ def simple_stateless_pipeline() -> Pipeline:
     pipeline = Pipeline()
 
     @pipeline.step()
-    def tester(data: pd.DataFrame) -> pd.DataFrame:
-        data["tested"] = True
-        return data
+    def tester(*frames) -> pd.DataFrame:
+        for df in frames:
+            df["tested"] = True
+        return frames
 
     return pipeline
 

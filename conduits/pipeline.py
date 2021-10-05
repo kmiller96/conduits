@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Union
 from inspect import signature
 from pathlib import Path
 
@@ -8,8 +8,10 @@ import networkx as nx
 import joblib
 from networkx.algorithms.traversal.edgebfs import edge_bfs
 
+DataStructure = Union[pd.DataFrame, pd.Series]
 
-def assert_data_is_pandas_type(obj) -> bool:
+
+def assert_data_is_pandas_type(obj: DataStructure) -> bool:
     """Forces the user to use Pandas types in their inputs."""
     valid_types = {pd.DataFrame, pd.Series}
 
@@ -31,11 +33,12 @@ class Pipeline:
         self._dag.add_node("root")
         self._functions = {}
 
-    def _execute(
-        self, data: pd.DataFrame, fit=False, transform=True, *args, **kwargs
-    ) -> pd.DataFrame:
-        assert_data_is_pandas_type(data)
-        data = data.copy()
+    def _execute(self, *args, fit=False, transform=True, **kwargs) -> pd.DataFrame:
+        args = list(args)
+
+        for i, obj in enumerate(args):
+            assert_data_is_pandas_type(obj)
+            args[i] = obj.copy()
 
         executed = set()
         for (source, dest) in edge_bfs(self._dag, source="root"):
@@ -50,7 +53,7 @@ class Pipeline:
             func = self._functions[dest]
             sig = signature(func).parameters
 
-            execution_args = [data, *args]
+            execution_args = args
             execution_kwargs = kwargs
 
             if "fit" in sig:
@@ -59,24 +62,30 @@ class Pipeline:
             if "transform" in sig:
                 execution_kwargs["transform"] = transform
 
-            data = func(*execution_args, **execution_kwargs)
+            outputs = func(*execution_args, **execution_kwargs)
 
-        return data
+        if len(outputs) == 1:
+            return outputs[1]  # Makes for a better developer UX.
+        else:
+            return outputs
 
     ######################
     ## Scikit Learn API ##
     ######################
 
-    def fit(self, X: pd.DataFrame) -> Pipeline:
-        self._execute(X, fit=True, transform=False)
+    def fit(self, *dataframes_or_series: Iterable[DataStructure]) -> Pipeline:
+        self._execute(*dataframes_or_series, fit=True, transform=False)
         return self
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        return self._execute(X, fit=False, transform=True)
+    def transform(
+        self, *dataframes_or_series: Iterable[DataStructure]
+    ) -> Iterable[DataStructure]:
+        return self._execute(*dataframes_or_series, fit=False, transform=True)
 
-    def fit_transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        self.fit(X)
-        return self.transform(X)
+    def fit_transform(
+        self, *dataframes_or_series: Iterable[DataStructure]
+    ) -> Iterable[DataStructure]:
+        return self._execute(*dataframes_or_series, fit=True, transform=True)
 
     ##############################################
     ## Artifact Serialisation / Deserialisation ##

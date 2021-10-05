@@ -11,3 +11,4 @@ Extensions:
 	[ ] Allow pipeline to be defined & executed sequentially.
 	✔ Allow pipeline artifacts to be cached in memory and saved/loaded at-will. @done(21-10-05 04:48)
 	[ ] Add PyPI CI/CD pipeline on commit to `master`
+	[ ] Allow the pipeline to pass the data either as one dataframe `data` or multiple dataframes `X, y`
