@@ -55,7 +55,7 @@ df = pd.DataFrame({"X": [1, 2, 3], "Y": [10, 20, 30]})
 
 assert pipeline["transformed"] == False
 
-output = pipeline.fit_transform(df, adder=1, multiplier=2)
+output = pipeline.fit_transform(df, adder=1, power=2)
 
 assert output.X.sum() != 29  # Addition before square => False!
 assert output.X.sum() == 17  # Square before addition => True!
