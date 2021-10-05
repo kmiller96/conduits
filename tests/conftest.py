@@ -1,5 +1,5 @@
 import pickle
-from uuid import uuid4
+from typing import Union
 from tempfile import NamedTemporaryFile
 from pathlib import Path
 
@@ -34,9 +34,10 @@ def simple_stateless_pipeline() -> Pipeline:
     pipeline = Pipeline()
 
     @pipeline.step()
-    def tester(data: pd.DataFrame) -> pd.DataFrame:
-        data["tested"] = True
-        return data
+    def tester(*frames) -> pd.DataFrame:
+        for df in frames:
+            df["tested"] = True
+        return frames
 
     return pipeline
 
@@ -120,6 +121,23 @@ def unordered_stateful_pipeline() -> Pipeline:
     @pipeline.step(dependencies=["B"])
     def C(data: pd.DataFrame) -> pd.DataFrame:
         data["string"] += "C"
+        return data
+
+    return pipeline
+
+
+@pytest.fixture
+def pipeline_with_hyperparams() -> Pipeline:
+    pipeline = Pipeline()
+
+    @pipeline.step()
+    def n(data: pd.DataFrame, *, n=0) -> pd.DataFrame:
+        data["n"] = n
+        return data
+
+    @pipeline.step()
+    def m(data: pd.DataFrame, *, m=0) -> pd.DataFrame:
+        data["m"] = m
         return data
 
     return pipeline

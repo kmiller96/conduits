@@ -7,7 +7,7 @@ publish: build
 	twine upload dist/*
 
 tests:
-	python -m pytest -v tests/
+	python -m pytest -xv tests/
 .PHONY: tests
 
 regressions:

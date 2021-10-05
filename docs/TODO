@@ -1,13 +1,16 @@
-MVP:
+Esentials:
 	✔ Declare pipelines via decorator syntax. @started(21-08-18 12:10) @done(21-08-18 12:11) @lasted(1m1s)
 	✔ Add helpful error messages. @done(21-08-29 12:30)
+	[ ] Add more examples to `examples/` directory
+
 
 Extensions:
 	[ ] Add pretty printing of pipeline progress.
 	[ ] Allow decorators to be optionally executed
 	[ ] Compute parallel depdendencies simultaneously.
 	[ ] Checkpoint pipeline state via decorator flag.
-	[ ] Supply hyperparameters to the functions at runtime (for hyperparameter tuning, etc.).
+	✔ Supply hyperparameters to the functions at runtime (for hyperparameter tuning, etc.). @done(21-10-05 06:34)
 	[ ] Allow pipeline to be defined & executed sequentially.
 	✔ Allow pipeline artifacts to be cached in memory and saved/loaded at-will. @done(21-10-05 04:48)
 	[ ] Add PyPI CI/CD pipeline on commit to `master`
+	✔ Allow the pipeline to pass the data either as one dataframe `data` or multiple dataframes `X, y` @done(21-10-05 06:34)
