@@ -74,19 +74,17 @@ appropriate method is called.
 def stateful(data: pd.DataFrame, fit: bool, transform: bool):
     if fit:
         scaler = StandardScaler()
-        scaler.fit(data)
-        joblib.dump(scaler, "scaler.joblib")
-        return data
+        pipeline["scaler"] = scaler.fit(data)
     
     if transform:
-        scaler = joblib.load(scaler, "scaler.joblib")
-        return scaler.transform(data)
+        data = pipeline["scaler"].transform(data)
+
+    return data
 ```
 
-**You should not serialise the pipeline object itself**. The pipeline is simply
-a declaration and shouldn't maintain any state. You should manage your pipeline
-DAG definition versions using a tool like Git. You will receive an error if you
-try to serialise the pipeline.
+**You should not serialise the pipeline object itself**. Rather, you should
+use the `pipeline.save(path)` and `pipeline.load(path)` to handle serialisation
+and deserialisation. 
 
 If there are any dependencies between your pipeline steps, you may specify these
 in your decorator and they will be run prior to this step being run in the 
@@ -111,6 +109,27 @@ out = pipeline.fit_transform(df)
 
 Note that for the current release you can only supply pandas dataframes or 
 series objects. It will not accept numpy arrays.
+
+You can save artifacts into the pipeline using standard dictionary notation.
+
+```python 
+pipeline["artifact"] = [1, 2, 3]
+artifact = pipeline["artifact"]
+```
+
+You can serialise all artifacts within the pipeline using the `pipeline.save(path)`
+and `pipeline.load(path)` methods. The pipeline will be serialised using the 
+joblib library.
+
+```python
+pipeline = Pipeline()
+...
+pipeline.save("pipeline.joblib")
+```
+
+```python
+pipline = Pipeline().load("pipeline.joblib")
+```
 
 ## Tests
 In order to run the testing suite you should install the `dev.requirements.txt`
