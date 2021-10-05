@@ -124,3 +124,20 @@ def unordered_stateful_pipeline() -> Pipeline:
         return data
 
     return pipeline
+
+
+@pytest.fixture
+def pipeline_with_hyperparams() -> Pipeline:
+    pipeline = Pipeline()
+
+    @pipeline.step()
+    def n(data: pd.DataFrame, *, n=0) -> pd.DataFrame:
+        data["n"] = n
+        return data
+
+    @pipeline.step()
+    def m(data: pd.DataFrame, *, m=0) -> pd.DataFrame:
+        data["m"] = m
+        return data
+
+    return pipeline

@@ -52,3 +52,13 @@ def test_pipeline_accepts_multiple_positional_arguments(
     for org, new in zip((A, B), (A_prime, B_prime)):
         assert len(org) == len(new)
         assert "tested" in new.columns
+
+
+def test_pipeline_passes_hyperparameters(
+    data: pd.DataFrame, pipeline_with_hyperparams: Pipeline
+):
+    pipeline = pipeline_with_hyperparams
+
+    output = pipeline.fit_transform(data, n=10, m=5)
+    assert (output["n"] == 10).all()
+    assert (output["m"] == 5).all()

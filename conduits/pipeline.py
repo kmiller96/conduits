@@ -53,16 +53,10 @@ class Pipeline:
             func = self._functions[dest]
             sig = signature(func).parameters
 
-            execution_args = args
-            execution_kwargs = kwargs
+            execution_kwargs = dict(fit=fit, transform=transform, **kwargs)
+            execution_kwargs = {k: v for k, v in execution_kwargs.items() if k in sig}
 
-            if "fit" in sig:
-                execution_kwargs["fit"] = fit
-
-            if "transform" in sig:
-                execution_kwargs["transform"] = transform
-
-            outputs = func(*execution_args, **execution_kwargs)
+            outputs = func(*args, **execution_kwargs)
 
         if len(outputs) == 1:
             return outputs[1]  # Makes for a better developer UX.
@@ -73,19 +67,17 @@ class Pipeline:
     ## Scikit Learn API ##
     ######################
 
-    def fit(self, *dataframes_or_series: Iterable[DataStructure]) -> Pipeline:
-        self._execute(*dataframes_or_series, fit=True, transform=False)
+    def fit(self, *structs: Iterable[DataStructure], **hyperparams) -> Pipeline:
+        self._execute(*structs, fit=True, transform=False, **hyperparams)
         return self
 
-    def transform(
-        self, *dataframes_or_series: Iterable[DataStructure]
-    ) -> Iterable[DataStructure]:
-        return self._execute(*dataframes_or_series, fit=False, transform=True)
+    def transform(self, *structs: Iterable[DataStructure]) -> Iterable[DataStructure]:
+        return self._execute(*structs, fit=False, transform=True)
 
     def fit_transform(
-        self, *dataframes_or_series: Iterable[DataStructure]
+        self, *structs: Iterable[DataStructure], **hyperparams
     ) -> Iterable[DataStructure]:
-        return self._execute(*dataframes_or_series, fit=True, transform=True)
+        return self._execute(*structs, fit=True, transform=True, **hyperparams)
 
     ##############################################
     ## Artifact Serialisation / Deserialisation ##
