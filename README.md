@@ -1,7 +1,7 @@
 # Conduits - A Declarative Pipelining Tool For Pandas
 Traditional tools for declaring pipelines in Python suck. They are mostly 
 imperative, and can sometimes requires that you adhere to strong contracts in
-order to use them (looking at you Scikit Learn pipelines ��). It is also 
+order to use them (looking at you Scikit Learn pipelines ಠ_ಠ). It is also 
 usually done completely differently to the way the pipelines where developed 
 during the ideation phase, requiring significate rewrite to get them to work
 in the new paradigm.
@@ -37,6 +37,7 @@ def second_step(data):
 @pipeline.step()
 def first_step(data):
     return data ** 2
+
 
 @pipeline.step(dependencies=["second_step"])
 def third_step(data, fit: bool, transform: bool):
@@ -144,7 +145,7 @@ pipeline.save("pipeline.joblib")
 ```
 
 ```python
-pipline = Pipeline().load("pipeline.joblib")
+pipeline = Pipeline().load("pipeline.joblib")
 ```
 
 ## Tests
