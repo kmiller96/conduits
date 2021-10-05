@@ -8,3 +8,6 @@ Extensions:
 	[ ] Compute parallel depdendencies simultaneously.
 	[ ] Checkpoint pipeline state via decorator flag.
 	[ ] Supply hyperparameters to the functions at runtime (for hyperparameter tuning, etc.).
+	[ ] Allow pipeline to be defined & executed sequentially.
+	✔ Allow pipeline artifacts to be cached in memory and saved/loaded at-will. @done(21-10-05 04:48)
+	[ ] Add PyPI CI/CD pipeline on commit to `master`

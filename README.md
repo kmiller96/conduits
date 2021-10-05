@@ -1,7 +1,7 @@
 # Conduits - A Declarative Pipelining Tool For Pandas
 Traditional tools for declaring pipelines in Python suck. They are mostly 
 imperative, and can sometimes requires that you adhere to strong contracts in
-order to use them (looking at you Scikit Learn pipelines ��). It is also 
+order to use them (looking at you Scikit Learn pipelines ಠ_ಠ). It is also 
 usually done completely differently to the way the pipelines where developed 
 during the ideation phase, requiring significate rewrite to get them to work
 in the new paradigm.
@@ -26,6 +26,7 @@ from conduits import Pipeline
 ##########################
 
 pipeline = Pipeline()
+pipeline["transformed"] = False
 
 
 @pipeline.step(dependencies=["first_step"])
@@ -38,15 +39,31 @@ def first_step(data):
     return data ** 2
 
 
+@pipeline.step(dependencies=["second_step"])
+def third_step(data, fit: bool, transform: bool):
+    if transform:
+        pipeline["transformed"] = True
+
+    return data
+
+
 ###############
 ## Execution ##
 ###############
 
 df = pd.DataFrame({"X": [1, 2, 3], "Y": [10, 20, 30]})
 
+assert pipeline["transformed"] == False
+
 output = pipeline.fit_transform(df)
 assert output.X.sum() != 29  # Addition before square => False!
 assert output.X.sum() == 17  # Square before addition => True!
+assert pipeline["transformed"] == True
+
+pipeline.save("pipeline.joblib")
+
+reloaded = Pipeline().load("pipeline.joblib")
+assert reloaded["transformed"] == True  # State is persisted on reload.
 ```
 
 ## Usage Guide
@@ -74,19 +91,17 @@ appropriate method is called.
 def stateful(data: pd.DataFrame, fit: bool, transform: bool):
     if fit:
         scaler = StandardScaler()
-        scaler.fit(data)
-        joblib.dump(scaler, "scaler.joblib")
-        return data
+        pipeline["scaler"] = scaler.fit(data)
     
     if transform:
-        scaler = joblib.load(scaler, "scaler.joblib")
-        return scaler.transform(data)
+        data = pipeline["scaler"].transform(data)
+
+    return data
 ```
 
-**You should not serialise the pipeline object itself**. The pipeline is simply
-a declaration and shouldn't maintain any state. You should manage your pipeline
-DAG definition versions using a tool like Git. You will receive an error if you
-try to serialise the pipeline.
+**You should not serialise the pipeline object itself**. Rather, you should
+use the `pipeline.save(path)` and `pipeline.load(path)` to handle serialisation
+and deserialisation. 
 
 If there are any dependencies between your pipeline steps, you may specify these
 in your decorator and they will be run prior to this step being run in the 
@@ -111,6 +126,27 @@ out = pipeline.fit_transform(df)
 
 Note that for the current release you can only supply pandas dataframes or 
 series objects. It will not accept numpy arrays.
+
+You can save artifacts into the pipeline using standard dictionary notation.
+
+```python 
+pipeline["artifact"] = [1, 2, 3]
+artifact = pipeline["artifact"]
+```
+
+You can serialise all artifacts within the pipeline using the `pipeline.save(path)`
+and `pipeline.load(path)` methods. The pipeline will be serialised using the 
+joblib library.
+
+```python
+pipeline = Pipeline()
+...
+pipeline.save("pipeline.joblib")
+```
+
+```python
+pipeline = Pipeline().load("pipeline.joblib")
+```
 
 ## Tests
 In order to run the testing suite you should install the `dev.requirements.txt`
