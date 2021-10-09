@@ -150,6 +150,8 @@ class Pipeline:
 
         if dependencies:
             for dep in dependencies:
+                if not isinstance(dep, str):
+                    dep = dep.__name__
                 self._dag.add_edge(dep, this)
 
         else:
