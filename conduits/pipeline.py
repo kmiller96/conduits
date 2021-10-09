@@ -71,8 +71,10 @@ class Pipeline:
         self._execute(*structs, fit=True, transform=False, **hyperparams)
         return self
 
-    def transform(self, *structs: Iterable[DataStructure]) -> Iterable[DataStructure]:
-        return self._execute(*structs, fit=False, transform=True)
+    def transform(
+        self, *structs: Iterable[DataStructure], **hyperparams
+    ) -> Iterable[DataStructure]:
+        return self._execute(*structs, fit=False, transform=True, **hyperparams)
 
     def fit_transform(
         self, *structs: Iterable[DataStructure], **hyperparams
