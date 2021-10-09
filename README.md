@@ -81,6 +81,18 @@ def transformer(df):
     return df + 1
 ```
 
+If there are any dependencies between your pipeline steps, you may specify these
+in your decorator and they will be run prior to this step being run in the 
+pipeline. If a step has no dependencies specified it will be assumed that it can
+be run at any point.
+
+```python
+@pipeline.step(dependencies=["add_feature_X", "add_feature_Y"])
+def combine_X_with_Y(df):
+    return df.X + df.Y
+```
+
+
 #### Function Signature
 The decorated function's signature carries all the information Conduits needs
 to infer what functionality it needs to activate. You can pass in a single 
@@ -165,17 +177,6 @@ def stateful(data: pd.DataFrame, fit: bool, transform: bool):
 **You should not serialise the pipeline object itself**. Rather, you should
 use the `pipeline.save(path)` and `pipeline.load(path)` to handle serialisation
 and deserialisation. 
-
-If there are any dependencies between your pipeline steps, you may specify these
-in your decorator and they will be run prior to this step being run in the 
-pipeline. If a step has no dependencies specified it will be assumed that it can
-be run at any point.
-
-```python
-@pipeline.step(dependencies=["add_feature_X", "add_feature_Y"])
-def combine_X_with_Y(df):
-    return df.X + df.Y
-```
 
 ### API
 Conduits attempts to mock the Scikit Learn API as best as possible. Your defined 
